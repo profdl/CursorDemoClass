@@ -6,7 +6,8 @@ export class UIController {
             pattern: {},
             shape: {},
             animation: {},
-            interaction: {}
+            interaction: {},
+            color: {}
         };
     }
 
@@ -55,47 +56,86 @@ export class UIController {
         const shapeControls = select('#shape-controls');
         const shapeConfig = CONFIG.CONTROLS.SHAPE;
         
+        // Shape type selector
+        this.controls.shape.type = createSelect();
+        this.controls.shape.type.parent(shapeControls);
+        shapeConfig.TYPE.options.forEach(option => {
+            this.controls.shape.type.option(option);
+        });
+        this.controls.shape.type.value(shapeConfig.TYPE.default);
+        this.controls.shape.type.style('margin-bottom', '12px');
+        
         // Shape sliders
         this.controls.shape.height = this.createSliderWithLabel('Height', shapeConfig.HEIGHT, shapeControls);
         this.controls.shape.width = this.createSliderWithLabel('Width', shapeConfig.WIDTH, shapeControls);
+        this.controls.shape.points = this.createSliderWithLabel('Points', shapeConfig.POINTS, shapeControls);
+        
+        // Show/hide points slider based on shape type
+        this.controls.shape.type.changed(() => {
+            const type = this.controls.shape.type.value();
+            this.controls.shape.points.slider.style('display', 
+                ['star', 'polygon'].includes(type) ? 'block' : 'none');
+        });
+    }
+
+    setupColorControls() {
+        const colorControls = createDiv();
+        colorControls.parent(select('#controls'));
+        colorControls.class('control-group');
+        
+        const title = createElement('h3');
+        title.html('Color');
+        title.parent(colorControls);
+        
+        // Color palette selector
+        this.controls.color.palette = createSelect();
+        this.controls.color.palette.parent(colorControls);
+        CONFIG.CONTROLS.COLOR.PALETTES.options.forEach(option => {
+            this.controls.color.palette.option(option);
+        });
+        this.controls.color.palette.value(CONFIG.CONTROLS.COLOR.PALETTES.default);
+        this.controls.color.palette.style('margin-bottom', '12px');
         
         // Color pickers
-        const colorDiv = createDiv();
-        colorDiv.parent(shapeControls);
-        colorDiv.class('color-pickers');
+        const colorPickers = createDiv();
+        colorPickers.class('color-pickers');
+        colorPickers.parent(colorControls);
         
-        this.controls.shape.color1 = createColorPicker('#000000');
-        this.controls.shape.color2 = createColorPicker('#ff0000');
-        this.controls.shape.color1.parent(colorDiv);
-        this.controls.shape.color2.parent(colorDiv);
+        this.controls.color.primary = createColorPicker(CONFIG.CONTROLS.COLOR.PRIMARY.default);
+        this.controls.color.secondary = createColorPicker(CONFIG.CONTROLS.COLOR.SECONDARY.default);
+        this.controls.color.background = createColorPicker(CONFIG.CONTROLS.COLOR.BACKGROUND.default);
         
-        // Shape selector
-        this.controls.shape.selector = createSelect();
-        this.controls.shape.selector.parent(shapeControls);
-        this.controls.shape.selector.option('Rectangle');
-        this.controls.shape.selector.option('Circle');
-        this.controls.shape.selector.option('Triangle');
+        [this.controls.color.primary, 
+         this.controls.color.secondary, 
+         this.controls.color.background].forEach(picker => picker.parent(colorPickers));
     }
 
     setupAnimationControls() {
         const animationControls = select('#animation-controls');
         const animationConfig = CONFIG.CONTROLS.ANIMATION;
         
-        // Speed slider
+        // Animation preset selector
+        this.controls.animation.preset = createSelect();
+        this.controls.animation.preset.parent(animationControls);
+        animationConfig.PRESET.options.forEach(option => {
+            this.controls.animation.preset.option(option);
+        });
+        this.controls.animation.preset.value(animationConfig.PRESET.default);
+        this.controls.animation.preset.style('margin-bottom', '12px');
+        
+        // Animation sliders
         this.controls.animation.speed = this.createSliderWithLabel('Speed', animationConfig.SPEED, animationControls);
+        this.controls.animation.amplitude = this.createSliderWithLabel('Amplitude', animationConfig.AMPLITUDE, animationControls);
+        this.controls.animation.frequency = this.createSliderWithLabel('Frequency', animationConfig.FREQUENCY, animationControls);
         
-        // Checkboxes
-        const checkboxGroup = createDiv();
-        checkboxGroup.class('checkbox-group');
-        checkboxGroup.parent(animationControls);
-        
-        this.controls.animation.autoRotate = createCheckbox('Auto Rotate', false);
-        this.controls.animation.waveMotion = createCheckbox('Wave Motion', false);
-        this.controls.animation.pulseSize = createCheckbox('Pulse Size', false);
-        
-        [this.controls.animation.autoRotate, 
-         this.controls.animation.waveMotion, 
-         this.controls.animation.pulseSize].forEach(checkbox => checkbox.parent(checkboxGroup));
+        // Show/hide animation sliders based on preset
+        this.controls.animation.preset.changed(() => {
+            const preset = this.controls.animation.preset.value();
+            const showSliders = preset !== 'none';
+            this.controls.animation.speed.slider.style('display', showSliders ? 'block' : 'none');
+            this.controls.animation.amplitude.slider.style('display', showSliders ? 'block' : 'none');
+            this.controls.animation.frequency.slider.style('display', showSliders ? 'block' : 'none');
+        });
     }
 
     setupInteractionControls() {
@@ -119,6 +159,7 @@ export class UIController {
     setup() {
         this.setupPatternControls();
         this.setupShapeControls();
+        this.setupColorControls();
         this.setupAnimationControls();
         this.setupInteractionControls();
         return this.controls;

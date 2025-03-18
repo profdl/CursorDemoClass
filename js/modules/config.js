@@ -14,11 +14,31 @@ export const CONFIG = {
             RADIUS: { min: 50, max: 150, default: 100, step: 1 }
         },
         SHAPE: {
+            TYPE: {
+                options: ['rectangle', 'circle', 'star', 'polygon', 'diamond'],
+                default: 'rectangle'
+            },
             HEIGHT: { min: 10, max: 200, default: 100, step: 1 },
-            WIDTH: { min: 5, max: 50, default: 20, step: 1 }
+            WIDTH: { min: 5, max: 50, default: 20, step: 1 },
+            POINTS: { min: 3, max: 12, default: 5, step: 1 } // For star and polygon
+        },
+        COLOR: {
+            PALETTES: {
+                options: ['default', 'monochrome', 'complementary', 'analogous', 'triadic', 'rainbow'],
+                default: 'default'
+            },
+            PRIMARY: { default: '#FF69B4' },
+            SECONDARY: { default: '#4A90E2' },
+            BACKGROUND: { default: '#1E1E1E' }
         },
         ANIMATION: {
-            SPEED: { min: 0.1, max: 5, default: 1, step: 0.1 }
+            PRESET: {
+                options: ['none', 'wave', 'pulse', 'bounce', 'ripple'],
+                default: 'none'
+            },
+            SPEED: { min: 0.1, max: 5, default: 1, step: 0.1 },
+            AMPLITUDE: { min: 0, max: 50, default: 20, step: 1 },
+            FREQUENCY: { min: 0.1, max: 5, default: 1, step: 0.1 }
         }
     },
     INTERACTION: {
