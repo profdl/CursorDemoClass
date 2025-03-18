@@ -27,7 +27,8 @@ export class PatternCalculator {
                 
             case 'Circular':
                 const totalCount = rows * cols;
-                const radius = this.controls.pattern.radius.slider.value();
+                const baseRadius = this.controls.pattern.radius.slider.value();
+                const radius = baseRadius + (spacing * 0.5);
                 const angle = (i * TWO_PI) / totalCount;
                 x = CONFIG.CANVAS.WIDTH/2 + cos(angle) * radius;
                 y = CONFIG.CANVAS.HEIGHT/2 + sin(angle) * radius;
