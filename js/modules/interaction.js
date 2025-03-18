@@ -38,8 +38,9 @@ export class InteractionHandler {
     }
 
     updateTime() {
-        const preset = this.controls.animation.preset.value();
-        if (preset !== 'none') {
+        if (this.controls.animation.autoRotate.checked() || 
+            this.controls.animation.waveMotion.checked() || 
+            this.controls.animation.pulseSize.checked()) {
             this.time += this.controls.animation.speed.slider.value() * 0.02;
         }
     }
@@ -52,31 +53,9 @@ export class InteractionHandler {
             mouseInfluence: 0
         };
 
-        const preset = this.controls.animation.preset.value();
-        const speed = this.controls.animation.speed.slider.value();
-        const amplitude = this.controls.animation.amplitude.slider.value();
-        const frequency = this.controls.animation.frequency.slider.value();
-
-        switch(preset) {
-            case 'wave':
-                effects.yOffset = sin(this.time * frequency + i * 0.5) * amplitude;
-                break;
-            case 'pulse':
-                effects.sizeMultiplier = 1 + sin(this.time * frequency + i * 0.3) * (amplitude / 100);
-                break;
-            case 'bounce':
-                effects.yOffset = abs(sin(this.time * frequency + i * 0.2)) * amplitude;
-                break;
-            case 'ripple':
-                let dx = x - this.lastMouseClick.x;
-                let dy = y - this.lastMouseClick.y;
-                let distance = sqrt(dx * dx + dy * dy);
-                let timeSinceClick = millis() - this.lastMouseClick.time;
-                if (timeSinceClick < CONFIG.INTERACTION.RIPPLE_DURATION) {
-                    let rippleRadius = timeSinceClick / CONFIG.INTERACTION.RIPPLE_SPEED;
-                    effects.yOffset = sin(distance - rippleRadius) * amplitude * (1 - timeSinceClick / CONFIG.INTERACTION.RIPPLE_DURATION);
-                }
-                break;
+        // Wave motion
+        if (this.controls.animation.waveMotion.checked()) {
+            effects.yOffset = sin(this.time + i * 0.5) * 30;
         }
 
         // Mouse interaction
@@ -89,9 +68,19 @@ export class InteractionHandler {
             }
         }
 
+        // Auto rotation
+        if (this.controls.animation.autoRotate.checked()) {
+            effects.rotation += this.time * 50;
+        }
+
         // Mouse influence on rotation
         if (effects.mouseInfluence > 0) {
             effects.rotation += effects.mouseInfluence * 45 * sin(this.time * 2);
+        }
+
+        // Size pulse
+        if (this.controls.animation.pulseSize.checked()) {
+            effects.sizeMultiplier += sin(this.time * 2 + i * 0.3) * 0.2;
         }
 
         // Mouse influence on size
